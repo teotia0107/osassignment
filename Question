@@ -1,0 +1,4 @@
+Que2. Write a multithread program that calculates various statistical values for a list of numbers.This program will be passed a series of number on the command
+line and will then create three seprate worker threads.one thread will determine the average of the numberthe second will determine the maximum values 
+and third will determine the minimum values.for example,suppose your program is passed the integers 90 81 78 95 79 72 85
+
