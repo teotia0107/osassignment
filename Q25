@@ -1,11 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<sys/wait.h>
-#include<string.h>
-#include<ctype.h>
-#include<assert.h>
-#include<stdbool.h>
 char *toggleString(char *argv)
 {
     int i;     
@@ -46,7 +41,8 @@ printf("\nSorry dont have alphabetic\nRun me again, with at least 1 Alphabetical
 exit(EXIT_FAILURE);
 }   
 return (0);   
-}}
+}
+}
 int main(int argc, char *argv[]) {
 assert(argc>1);
 int fd[2*NUM_PIPES];    
@@ -64,8 +60,6 @@ perror("Failed to allocate pipes");
         exit(EXIT_FAILURE);
         }
     }
-
-    
     if ((pid = fork()) < 0)
     {
         perror("Failed to fork process");
@@ -75,11 +69,8 @@ perror("Failed to allocate pipes");
 {
        close(fd[P1_READ]);
         close(fd[P1_WRITE]);
-
-        pid = getpid();
-
-       
-        len = read(fd[P2_READ], &child, len);
+    pid = getpid();
+    len = read(fd[P2_READ], &child, len);
         if (len < 0)
         {
             perror("Child: Failed to read data from pipe");
@@ -87,49 +78,31 @@ perror("Failed to allocate pipes");
         }
         else if (len == 0)
         {
-            // not an error, but certainly unexpected
             fprintf(stderr, "Child: Read EOF from pipe");
         }
         else
         {
-
-             
-            printf("Child(%d): Recieved Message\n\nChild(%d): Toggling Case and Sending to Parent\n",pid, pid);
-
-            // send the message to toggleString and write it to pipe//
-            if (write(fd[P2_WRITE], toggleString(child), strlen(child)) < 0)
+        printf("Child(%d): Recieved Message\n\nChild(%d): Toggling Case and Sending to Parent\n",pid, pid);
+       if (write(fd[P2_WRITE], toggleString(child), strlen(child)) < 0)
             {
                 perror("Child: Failed to write response value");
                 exit(EXIT_FAILURE);
-
-            }
-        
+            }        
         }
-
-       
-        close(fd[P2_READ]);
+close(fd[P2_READ]);
         close(fd[P2_WRITE]);
-
         return EXIT_SUCCESS;
     }
- 
-
-    close(fd[P2_READ]);
+     close(fd[P2_READ]);
     close(fd[P2_WRITE]);
-
-  
-    pid = getpid();
-
-    
-    
-    printf("\nParent(%d): Sending %s to Child\n\n", pid, argv[1]);
+   pid = getpid();
+   printf("\nParent(%d): Sending %s to Child\n\n", pid, argv[1]);
     if (write(fd[P1_WRITE], argv[1], strlen(argv[1])) != strlen(argv[1]))
     {
         perror("Parent: Failed to send value to child ");
         exit(EXIT_FAILURE);
     }
-
-    len = read(fd[P1_READ], &parent, strlen(parent));
+ len = read(fd[P1_READ], &parent, strlen(parent));
     if (len < 0)
     {
         perror("Parent: failed to read value from pipe");
